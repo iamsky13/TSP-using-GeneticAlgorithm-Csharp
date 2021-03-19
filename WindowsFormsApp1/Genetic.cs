@@ -13,7 +13,11 @@ namespace ShortestPathGenetic
         public int OrderIndex { get; set; }
     }
 
-    
+    public class Population
+    {
+        public Nodes[] Nodes { get; set; }
+        public Double Fitness { get; set; }
+    }
     public class Genetic
     {
         Random random = new Random();
@@ -47,6 +51,26 @@ namespace ShortestPathGenetic
             nodes[firstIndex].OrderIndex = nodes[secondIndex].OrderIndex;
             nodes[secondIndex].OrderIndex = temp;
             return nodes;
+        }
+
+        public double CalculateTotalDistance(Nodes[] nodes)
+        {
+            double PathSum = 0;
+            for (int i=0; i < nodes.Length - 1; i++)
+            {
+                Nodes nodeA = Array.Find(nodes, a => a.OrderIndex == i);
+                Nodes nodeB = Array.Find(nodes, a => a.OrderIndex == (i + 1));
+                double distance = CalculateDisplacement(nodeA.Coordinates, nodeB.Coordinates);
+                PathSum += distance;
+            }
+            return PathSum;
+        }
+
+        private double CalculateDisplacement(int[] coordinates1, int[] coordinates2)
+        {
+            double distX = coordinates1[0] - coordinates2[0];
+            double distY = coordinates1[1] - coordinates2[1];
+            return Math.Sqrt(distX * distX + distY * distY);
         }
     }
 }

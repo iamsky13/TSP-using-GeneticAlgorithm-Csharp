@@ -19,22 +19,36 @@ namespace ShortestPathGenetic
         public Form1()
         {
             InitializeComponent();
-           
+            graphic=panel1.CreateGraphics();
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             int populationSize = 10;
             var nodes = geneticAlgService.GenerateNodes(5);
-            Nodes[][] population = new Nodes[populationSize][];
+            Population[] samplePopulation = new Population[populationSize];
+            Population bestPopulation = new Population(); ;
+            double minDistance = double.MaxValue;
+
             for (var i = 0; i < populationSize; i++)
             {
                 Nodes[] copyofNodes = DeepCopyNodes(nodes);
-                population[i] = new Nodes[nodes.Length];
-                population[i] = geneticAlgService.ShuffleOrderIndex(copyofNodes, 10*(i+1));
+                samplePopulation[i] = new Population();
+                samplePopulation[i].Nodes = geneticAlgService.ShuffleOrderIndex(copyofNodes, 10*(i+1));
             }
-            
-            GenerateGraphic(nodes);
+            for (int j = 0; j < samplePopulation.Length; j++)
+            {
+                double TotalPathDistance = geneticAlgService.CalculateTotalDistance(samplePopulation[j].Nodes);
+                if (TotalPathDistance < minDistance)
+                {
+                    minDistance = TotalPathDistance;
+                    bestPopulation = samplePopulation[j];
+                }
+                samplePopulation[j].Fitness = TotalPathDistance;
+            }
+            graphic.Clear(Color.White);
+            GenerateGraphic(bestPopulation.Nodes);
 
         }
 
@@ -57,16 +71,21 @@ namespace ShortestPathGenetic
         {
             await Task.Factory.StartNew(() =>
             {
-                graphic = panel1.CreateGraphics();
+                
                 pen = new Pen(Color.Red, 5);
-                pen1 = new Pen(Color.White, 5);
+                pen1 = new Pen(Color.White, 1);
                 SolidBrush sb = new SolidBrush(Color.Red);
                 Point p1 = new Point(0, 0);
                 for (int i = 0; i < nodes.Length; i++)
                 {
                     graphic.DrawEllipse(pen, nodes[i].Coordinates[0], nodes[i].Coordinates[1], 5, 5);
                 }
-
+                for (int i = 0; i < nodes.Length-1; i++)
+                {
+                    graphic.DrawLine(pen, 
+                        new Point(nodes[i].Coordinates[0], nodes[i].Coordinates[1]),
+                         new Point(nodes[i+1].Coordinates[0], nodes[i+1].Coordinates[1]));
+                }
                 //Point p2 = new Point(150, 350);
                 //graphic.DrawEllipse(pen, 0, 0, 10, 5);
                 //graphic.DrawEllipse(pen, 150, 350, 10, 5);
