@@ -16,8 +16,9 @@ namespace ShortestPathGenetic
         Graphics graphic;
         Graphics bestPathGraphic;
         Pen pen;
-        Pen pen1;
         Genetic geneticAlgService = new Genetic();
+
+        //for making application responsive while it is running
         CancellationTokenSource cancellationTokenSource;
         public Form1()
         {
@@ -25,10 +26,10 @@ namespace ShortestPathGenetic
             graphic = panel1.CreateGraphics();
             bestPathGraphic = bestPathPanel.CreateGraphics();
             button1.Text = "Start";
-            //currentPath.Text = "0";
         }
-        private async void button1_ClickAsync(object sender, EventArgs e)
+        private async void button_startstopClicked(object sender, EventArgs e)
         {
+            //setup sourceIndex, destinationIndex and total Nodes
             int startNodeIndex = 0;
             int DestinationNodeIndex = 6;
             int totalNodes = 10;
@@ -50,8 +51,10 @@ namespace ShortestPathGenetic
                         Population bestPopulation = await CalculateBestPopulation(population, double.MaxValue, cancellationTokenSource.Token);
                         NormalizeFitness(population);
 
+                        //nextGenerationPopulation is calculated is mutation
                         Population[] nextGenerationPopulation = await geneticAlgService.CalculateNextGenerationPopulation(population);
                         await CalculateBestPopulation(nextGenerationPopulation, bestPopulation.PathLength, cancellationTokenSource.Token);
+                        NormalizeFitness(nextGenerationPopulation);
                     }
                     catch (Exception)
                     {
@@ -78,16 +81,23 @@ namespace ShortestPathGenetic
 
         private async Task<Population> CalculateBestPopulation(Population[] samplePopulations, double minDistance, CancellationToken token)
         {
+            
             Population bestPopulation = new Population();
 
             for (int i = 0; i < samplePopulations.Length; i++)
             {
+                //if stop is clicked while loop is running 
+                if (token.IsCancellationRequested)
+                {
+                    button1.Text = "Start";
+                    break;
+                }
                 double TotalPathDistance = geneticAlgService.CalculateTotalDistance(samplePopulations[i].Nodes);
                 samplePopulations[i].PathLength = TotalPathDistance;
                 graphic.Clear(Color.White);
                 await GenerateGraphic(samplePopulations[i]);
                 Console.WriteLine(i);
-
+                //if new optimal path is found
                 if (TotalPathDistance < minDistance)
                 {
                     minDistance = TotalPathDistance;
@@ -118,11 +128,13 @@ namespace ShortestPathGenetic
             Population[] samplePopulation = new Population[populationSize];
             for (var i = 0; i < populationSize; i++)
             {
+                //if stop is clicked while loop is running 
                 if (cancellationToken.IsCancellationRequested)
                 {
                     button1.Text = "Start";
                     break;
                 }
+                //array is reference type we need to create new array 
                 Nodes[] copyofNodes = geneticAlgService.DeepCopyNodes(nodes);
                 samplePopulation[i] = new Population();
                 samplePopulation[i].Nodes = geneticAlgService.ShuffleNodes(copyofNodes, 10 * (i + 1));
@@ -142,7 +154,6 @@ namespace ShortestPathGenetic
             {
 
                 pen = new Pen(Color.Red, 5);
-                pen1 = new Pen(Color.White, 1);
                 SolidBrush sb = new SolidBrush(Color.Red);
                 Point p1 = new Point(0, 0);
 
@@ -172,7 +183,6 @@ namespace ShortestPathGenetic
             {
 
                 pen = new Pen(Color.Red, 5);
-                pen1 = new Pen(Color.White, 1);
                 SolidBrush sb = new SolidBrush(Color.Red);
                 Point p1 = new Point(0, 0);
                 bestPathGraphic.DrawString(bestPopulation.PathLength.ToString("0.####"), new Font("Arial", 12), Brushes.Green, 327, 20);
@@ -196,15 +206,6 @@ namespace ShortestPathGenetic
             });
 
         }
-
-        private void currentPath_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panel1_MouseClick(object sender, MouseEventArgs e)
-        {
-
-        }
+        
     }
 }

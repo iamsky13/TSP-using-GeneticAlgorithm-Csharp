@@ -39,7 +39,7 @@ namespace ShortestPathGenetic
             nodes[destinationNodeIndex].IsStartOrEndNode = true;
             if(destinationNodeIndex+1 != TotalNodes)
             {
-                SwapCoordinates(nodes, destinationNodeIndex, TotalNodes - 1);
+                SwapOrderIndex(nodes, destinationNodeIndex, TotalNodes - 1);
             }
             return nodes;
         }
@@ -52,14 +52,14 @@ namespace ShortestPathGenetic
                 var secondIndex = random.Next(0, nodes.Length);
                 if(!nodes[firstIndex].IsStartOrEndNode && !nodes[secondIndex].IsStartOrEndNode)
                 {
-                    nodes = SwapCoordinates(nodes, firstIndex, secondIndex);
+                    nodes = SwapOrderIndex(nodes, firstIndex, secondIndex);
                 }
                 
             }
             return nodes;
         }
 
-        private Nodes[] SwapCoordinates(Nodes[] nodes, int firstIndex, int secondIndex)
+        private Nodes[] SwapOrderIndex(Nodes[] nodes, int firstIndex, int secondIndex)
         {
             var temp = nodes[firstIndex].OrderIndex;
             nodes[firstIndex].OrderIndex = nodes[secondIndex].OrderIndex;

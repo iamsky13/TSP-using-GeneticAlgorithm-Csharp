@@ -49,7 +49,6 @@ namespace ShortestPathGenetic
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(450, 560);
             this.panel1.TabIndex = 0;
-            this.panel1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseClick);
             // 
             // currentPathLabel
             // 
@@ -75,7 +74,7 @@ namespace ShortestPathGenetic
             this.button1.TabIndex = 0;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_ClickAsync);
+            this.button1.Click += new System.EventHandler(this.button_startstopClicked);
             // 
             // bestPathPanel
             // 
