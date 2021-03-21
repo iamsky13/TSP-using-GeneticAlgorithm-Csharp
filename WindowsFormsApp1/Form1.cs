@@ -31,8 +31,8 @@ namespace ShortestPathGenetic
         {
             //setup sourceIndex, destinationIndex and total Nodes
             int startNodeIndex = 0;
-            int DestinationNodeIndex = 6;
-            int totalNodes = 10;
+            int DestinationNodeIndex = 3;
+            int totalNodes = 6;
             if (button1.Text == "Start")
             {
                 button1.Text = "Stop";
